@@ -127,7 +127,12 @@ if SCANPY_AVAILABLE:
 
         # 6. Add buffer region to prevent arrows and legend from being cut off
         # Use tight_layout with rect parameter to preserve space while keeping aspect ratio
-        ax.figure.tight_layout(rect=(0.05, 0.05, 0.95, 0.95))
+        # Wrap in try/except because tight_layout conflicts with colorbars (gene expression plots)
+        try:
+            ax.figure.tight_layout(rect=(0.05, 0.05, 0.95, 0.95))
+        except RuntimeError:
+            # Colorbar present, skip tight_layout
+            pass
         # Adjust subplot parameters to ensure nothing is clipped
         ax.figure.subplots_adjust(left=0.1, bottom=0.1, right=0.85)
 

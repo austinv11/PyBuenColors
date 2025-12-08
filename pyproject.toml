@@ -1,7 +1,31 @@
 [project]
 name = "buencolors"
-version = "0.1.0"
+dynamic = ["version"]
 description = "A pythonic port of the BuenColors R library for handy color palettes."
+readme = {file = "README.md", content-type = "text/markdown"}
+license = "MIT"
+authors = [
+    {name = "Austin Varela", email = "aav4003@med.cornell.edu"},
+    {name = "Caleb Lareau", email = "lareauc@mskcc.org"},
+]
+maintainers = [
+    {name = "Austin Varela", email = "aav4003@med.cornell.edu"}
+]
+keywords = ["colors", "visualization", "matplotlib", "data-science", "palettes", 'bioinformatics']
+classifiers = [
+    "Development Status :: 5 Production/Stable",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Operating System :: OS Independent",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Scientific/Engineering :: Visualization",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
 requires-python = ">=3.11"
 dependencies = [
     "matplotlib>=3.9.0",
@@ -10,22 +34,62 @@ dependencies = [
     "scipy>=1.14.0",
 ]
 
-[build-system]
-requires = ["uv_build"]
-build-backend = "uv_build"
-# Alows us to use:
-## 1. Bump the version using uv
-#uv version --bump patch
-#
-## 2. Extract the new version for tagging
-#NEW_VERSION=$(uv version)
-#
-## 3. Commit the change (the automatic fill)
-#git commit -am "chore(release): bump version to $NEW_VERSION"
-#
-## 4. Create the git tag
-#git tag "v$NEW_VERSION"
-#
-## 5. Build the artifacts
-#uv build
+[project.urls]
+Homepage = "https://github.com/austinv11/PyBuenColors"
+Repository = "https://github.com/austinv11/PyBuenColors"
+Documentation = "https://austinv11.github.io/PyBuenColors/"
+"Bug Tracker" = "https://github.com/austinv11/PyBuenColors/issues"
+Changelog = "https://github.com/austinv11/PyBuenColors/releases"
 
+[build-system]
+requires = ["setuptools>=80", "wheel", "setuptools-scm>=8.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+include-package-data = true
+zip-safe = false
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools_scm]
+version_scheme = "guess-next-dev"
+local_scheme = "node-and-date"
+write_to = "src/buencolors/_version.py"
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "-v",
+    "--strict-markers",
+    "--tb=short",
+    "--disable-warnings",
+]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+]
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::PendingDeprecationWarning",
+]
+
+[project.optional-dependencies]
+dev = [
+    "setuptools>=80",
+    "mkdocs-material>=9.6.18",
+    "mkdocs>=1.6.1",
+    "pytest>=8.4.1",
+    "mkdocstrings[python]>=0.25",
+    "mkdocstrings-python>=1.0",
+    "mkdocs-jupyter>=0.25.1",
+    "mkdocs-api-autonav>=0.4.0",
+    "mkdocs-git-revision-date-localized-plugin>=1.5.0"
+]
+
+[tool.setuptools.package-data]
+prefixtrie = ["*.mplstyle"]

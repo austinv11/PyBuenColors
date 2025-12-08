@@ -1,5 +1,9 @@
 # PyBuenColors
 
+[![PyPI version](https://img.shields.io/pypi/v/buencolors.svg)](https://pypi.org/project/buencolors/)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/austinv11/PyBuenColors/ci.yml?branch=master)](https://github.com/austinv11/PyBuenColors/actions)
+[![License](https://img.shields.io/github/license/austinv11/PyBuenColors.svg)](https://github.com/austinv11/PyBuenColors/blob/master/LICENSE)
+
 A pythonic port of the [BuenColors R package](https://github.com/caleblareau/BuenColors) for convenient scientific color palettes and matplotlib styles.
 
 Color palettes are a direct port from the R package, with many based on the [wesanderson](https://github.com/karthik/wesanderson) R package.
@@ -35,11 +39,11 @@ plt.show()
 
 **Before (default):**
 
-![Default Style](figures/default_style.png)
+![Default Style](https://raw.githubusercontent.com/austinv11/PyBuenColors/master/figures/default_style.png)
 
 **After (pretty-plot):**
 
-![Pretty Style](figures/pretty_style.png)
+![Pretty Style](https://raw.githubusercontent.com/austinv11/PyBuenColors/master/figures/pretty_style.png)
 
 ### Using Color Palettes
 
@@ -89,7 +93,7 @@ plt.plot(x, y2, label='Dataset 2')
 bc.eject_legend()
 ```
 
-![Eject Legend Example](figures/util_eject_legend.png)
+![Eject Legend Example](https://raw.githubusercontent.com/austinv11/PyBuenColors/master/figures/util_eject_legend.png)
 
 #### Rotate X-Tick Labels
 
@@ -99,7 +103,7 @@ Automatically rotate discrete x-tick labels for better readability:
 bc.rotate_discrete_xticks()
 ```
 
-![Rotate XTicks Example](figures/util_rotate_xticks.png)
+![Rotate XTicks Example](https://raw.githubusercontent.com/austinv11/PyBuenColors/master/figures/util_rotate_xticks.png)
 
 #### Grab Legend
 
@@ -122,7 +126,7 @@ legend_fig.savefig('legend_copy.pdf', bbox_inches='tight')
 plt.show()  # Original plot still has legend
 ```
 
-![Grab Legend Example](figures/util_grab_legend.png)
+![Grab Legend Example](https://raw.githubusercontent.com/austinv11/PyBuenColors/master/figures/util_grab_legend.png)
 
 #### Color by Density
 
@@ -137,7 +141,7 @@ plt.scatter(x, y, c=density, cmap='viridis', s=5)
 plt.colorbar(label='Density')
 ```
 
-![Density Example](figures/util_density.png)
+![Density Example](https://raw.githubusercontent.com/austinv11/PyBuenColors/master/figures/util_density.png)
 
 #### Shuffle Plot Order
 
@@ -148,7 +152,7 @@ x_shuffled, y_shuffled, colors_shuffled = bc.shuffle(x, y, colors)
 plt.scatter(x_shuffled, y_shuffled, c=colors_shuffled)
 ```
 
-![Shuffle Example](figures/util_shuffle.png)
+![Shuffle Example](https://raw.githubusercontent.com/austinv11/PyBuenColors/master/figures/util_shuffle.png)
 
 #### Number to Color
 
@@ -159,7 +163,7 @@ values = [1, 2, 3, 4, 5]
 colors = bc.number_to_color(values, palette='Zissou')
 ```
 
-![Number to Color Example](figures/util_number_to_color.png)
+![Number to Color Example](https://raw.githubusercontent.com/austinv11/PyBuenColors/master/figures/util_number_to_color.png)
 
 ## Single-Cell Analysis
 
@@ -196,15 +200,15 @@ Features of `clean_umap()`:
 - **Auto-ejected legend**: Automatically positioned to the right to avoid obscuring data
 - **Shuffled cells**: Randomizes plotting order to avoid non-random ordering artifacts
 
-![Clean UMAP Example](figures/single_cell_clean_umap.png)
+![Clean UMAP Example](https://raw.githubusercontent.com/austinv11/PyBuenColors/master/figures/single_cell_clean_umap.png)
 
 ## Examples
 
-For detailed examples and interactive notebooks, see the [examples directory](examples/).
+For detailed examples and interactive notebooks, see the [documentation](https://austinv11.github.io/PyBuenColors/) or the [docs/examples directory](docs/examples/).
 
 ## Available Palettes
 
-![All Palettes](figures/all_palettes.png)
+![All Palettes](https://raw.githubusercontent.com/austinv11/PyBuenColors/master/figures/all_palettes.png)
 
 ## License
 

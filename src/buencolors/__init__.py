@@ -30,12 +30,10 @@ register_cmaps()
 # -----------------------------------------------------------------------------
 # 3. Metadata
 # -----------------------------------------------------------------------------
-import importlib.metadata
-
 try:
-    __version__ = importlib.metadata.version("buencolors")
-except importlib.metadata.PackageNotFoundError:
-    # Package is not installed (e.g., running script directly from source)
+    from ._version import __version__
+except ImportError:
+    # Fallback version if _version.py doesn't exist yet
     __version__ = "unknown"
 
 
