@@ -137,3 +137,17 @@ if SCANPY_AVAILABLE:
         ax.figure.subplots_adjust(left=0.1, bottom=0.1, right=0.85)
 
         return ax
+else:
+    def clean_umap(*args, **kwargs):
+        """Stub function when scanpy is not available.
+
+        Raises
+        ------
+        NotImplementedError
+            Always raised. Install scanpy and anndata to use this function:
+            pip install scanpy anndata
+        """
+        raise NotImplementedError(
+            "clean_umap requires scanpy and anndata to be installed. "
+            "Install them with: pip install scanpy anndata"
+        )

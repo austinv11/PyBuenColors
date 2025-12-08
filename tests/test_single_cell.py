@@ -1,12 +1,12 @@
 import pytest
 import numpy as np
 import matplotlib.pyplot as plt
+from buencolors.single_cell import clean_umap
 
 # Try to import single-cell dependencies
 try:
     import anndata as ad
     import scanpy as sc
-    from buencolors.single_cell import clean_umap
     SCANPY_AVAILABLE = True
 except ImportError:
     SCANPY_AVAILABLE = False
@@ -103,12 +103,7 @@ class TestCleanUMAP:
 
 
 @pytest.mark.skipif(SCANPY_AVAILABLE, reason="Test only when scanpy is not available")
-def test_clean_umap_not_available():
-    """Test that clean_umap is not available when dependencies are missing."""
-    try:
-        from buencolors.single_cell import clean_umap
-        # If we get here, the import succeeded when it shouldn't have
-        pytest.fail("clean_umap should not be available without scanpy")
-    except (ImportError, AttributeError):
-        # This is expected
-        pass
+def test_clean_umap_raises_not_implemented():
+    """Test that clean_umap raises NotImplementedError when dependencies are missing."""
+    with pytest.raises(NotImplementedError, match="clean_umap requires scanpy and anndata"):
+        clean_umap(None, color='test')
