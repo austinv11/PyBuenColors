@@ -195,9 +195,13 @@ with plt.style.context('pretty-plot'):
 ```
 
 Features of `clean_umap()`:
+
 - **Minimal decorations**: No borders, ticks, or frame
+
 - **Custom L-shaped axis indicators**: Small arrows showing UMAP dimensions
+
 - **Auto-ejected legend**: Automatically positioned to the right to avoid obscuring data
+
 - **Shuffled cells**: Randomizes plotting order to avoid non-random ordering artifacts
 
 ![Clean UMAP Example](https://raw.githubusercontent.com/austinv11/PyBuenColors/master/figures/single_cell_clean_umap.png)
