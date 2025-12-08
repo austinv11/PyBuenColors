@@ -110,7 +110,7 @@ def rotate_discrete_xticks(ax: Optional[plt.Axes] = None, rotation: float = 45) 
         label.set_ha('right')
 
 
-def grab_legend(ax: Optional[plt.Axes] = None) -> plt.Figure:
+def grab_legend(ax: Optional[plt.Axes] = None, remove: bool = True) -> plt.Figure:
     """Grab the legend from the axes and return it in a new figure for external saving or modification.
 
     This is useful for creating separate legend files for publications or presentations,
@@ -120,6 +120,9 @@ def grab_legend(ax: Optional[plt.Axes] = None) -> plt.Figure:
     ----------
     ax : plt.Axes, optional
         The axes to grab the legend from. If None, uses the current axes.
+    remove : bool, optional
+        If True (default), remove the legend from the original axes after extraction.
+        If False, keep the legend on the original axes.
 
     Returns
     -------
@@ -132,28 +135,37 @@ def grab_legend(ax: Optional[plt.Axes] = None) -> plt.Figure:
     >>> import numpy as np
     >>> import buencolors
     >>>
-    >>> # Create a plot
+    >>> # Create a plot and extract legend (removing it from original)
     >>> x = np.linspace(0, 10, 100)
     >>> plt.plot(x, np.sin(x), label='sin(x)', color='blue')
     >>> plt.plot(x, np.cos(x), label='cos(x)', color='red')
     >>> plt.plot(x, np.tan(x), label='tan(x)', color='green')
     >>> plt.legend()
     >>> plt.ylim(-2, 2)
-    >>> plt.savefig('plot.pdf')
     >>>
-    >>> # Extract and save legend separately
+    >>> # Extract and save legend separately (legend removed from plot)
     >>> legend_fig = buencolors.grab_legend()
     >>> legend_fig.savefig('legend.pdf', bbox_inches='tight')
+    >>> plt.savefig('plot.pdf')  # Plot saved without legend
     >>> plt.show()
     >>>
-    >>> # Use with specific axes
+    >>> # Extract legend while keeping it on the original axes
     >>> fig, ax = plt.subplots()
     >>> ax.scatter([1, 2, 3], [1, 4, 9], label='Data A', color='blue')
     >>> ax.scatter([1, 2, 3], [2, 3, 5], label='Data B', color='red')
     >>> ax.legend()
     >>>
-    >>> legend_fig = buencolors.grab_legend(ax)
+    >>> # Keep legend on original plot
+    >>> legend_fig = buencolors.grab_legend(ax, remove=False)
     >>> legend_fig.savefig('my_legend.png', dpi=300, bbox_inches='tight')
+    >>> plt.show()  # Original plot still has legend
+    >>>
+    >>> # Remove legend from original (default behavior)
+    >>> fig, ax = plt.subplots()
+    >>> ax.plot(x, np.exp(x), label='exp(x)')
+    >>> ax.legend()
+    >>> legend_fig = buencolors.grab_legend(ax, remove=True)
+    >>> plt.show()  # Original plot has no legend
     """
     if ax is None:
         ax = plt.gca()
@@ -174,14 +186,19 @@ def grab_legend(ax: Optional[plt.Axes] = None) -> plt.Figure:
     # Get legend bounding box in inches
     bbox = legend.get_window_extent().transformed(ax.figure.dpi_scale_trans.inverted())
 
-    # Remove the legend from the original axes
-    legend.remove()
+    # Remove the legend from the original axes if requested
+    if remove:
+        legend.remove()
 
     # Create a new figure for the legend with appropriate size
     fig, ax_legend = plt.subplots(figsize=(bbox.width, bbox.height))
 
     # Hide the axis
     ax_legend.axis('off')
+
+    # Ensure no title on the legend figure
+    ax_legend.set_title('')
+    fig.suptitle('')
 
     # Add the legend to the axis
     ax_legend.legend(handles=handles,

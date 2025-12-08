@@ -9,7 +9,7 @@ This directory contains Jupyter notebooks demonstrating all features of the Buen
 Demonstrates all helper functions including:
 - `eject_legend()` - Move legends outside plots
 - `rotate_discrete_xticks()` - Rotate axis labels
-- `grab_legend()` - Extract legends to separate figures
+- `grab_legend()` - Extract legends to separate figures (with optional `remove` parameter)
 - `get_density()` - Compute point density for scatter plots
 - `shuffle()` - Randomize data order
 - `number_to_color()` - Map values to colors

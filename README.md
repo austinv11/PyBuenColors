@@ -101,6 +101,29 @@ bc.rotate_discrete_xticks()
 
 ![Rotate XTicks Example](figures/util_rotate_xticks.png)
 
+#### Grab Legend
+
+Extract a legend to a separate figure for independent saving or publication:
+
+```python
+# Create a plot with legend
+plt.plot(x, y1, label='Dataset 1')
+plt.plot(x, y2, label='Dataset 2')
+plt.legend()
+
+# Extract legend to separate figure (removes from original by default)
+legend_fig = bc.grab_legend()
+legend_fig.savefig('legend.pdf', bbox_inches='tight')
+plt.savefig('plot.pdf')  # Plot saved without legend
+
+# Or keep legend on original plot
+legend_fig = bc.grab_legend(remove=False)
+legend_fig.savefig('legend_copy.pdf', bbox_inches='tight')
+plt.show()  # Original plot still has legend
+```
+
+![Grab Legend Example](figures/util_grab_legend.png)
+
 #### Color by Density
 
 Color scatter plot points by their density:
