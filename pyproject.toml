@@ -13,7 +13,7 @@ maintainers = [
 ]
 keywords = ["colors", "visualization", "matplotlib", "data-science", "palettes", 'bioinformatics']
 classifiers = [
-    "Development Status :: 5 Production/Stable",
+    "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
     "Intended Audience :: Science/Research",
     "Operating System :: OS Independent",
@@ -24,6 +24,7 @@ classifiers = [
     "Programming Language :: Python :: 3.14",
     "Topic :: Scientific/Engineering :: Visualization",
     "Topic :: Software Development :: Libraries :: Python Modules",
+    "Framework :: Matplotlib"
 ]
 requires-python = ">=3.11"
 dependencies = [
