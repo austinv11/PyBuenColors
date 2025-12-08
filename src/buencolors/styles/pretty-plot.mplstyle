@@ -1,0 +1,87 @@
+## Default Line Configuration:
+lines.linewidth: 2.0
+lines.linestyle: -
+lines.color: C0
+lines.marker: None
+lines.markerfacecolor: auto
+lines.markeredgecolor: auto
+lines.markersize: 6
+lines.markeredgewidth: 1.0
+lines.dash_joinstyle: round  # Round corners for dashed lines
+lines.solid_joinstyle: miter  # Sharp corners for solid lines
+lines.dash_capstyle: round  # Round ends for dashed lines
+lines.solid_capstyle: butt  # Flat ends for solid lines
+
+## The three standard dash patterns.  These are scaled by the linewidth.
+#lines.dashed_pattern: 3.7, 1.6
+#lines.dashdot_pattern: 6.4, 1.6, 1, 1.6
+#lines.dotted_pattern: 1, 1.65
+#lines.scale_dashes: True
+
+## Patches
+patch.linewidth: 1.5
+patch.facecolor: C0
+patch.edgecolor: black
+
+## Font
+# Same as default, but use Helvetica or Arial first if available
+font.sans-serif: Helvetica, Arial, DejaVu Sans, Bitstream Vera Sans, Computer Modern Sans Serif, Lucida Grande, Verdana, Geneva, Lucid, Avant Garde, sans-serif
+font.size: 12
+
+## Latex
+text.usetex: False
+#text.latex.preamble: \usepackage{amsmath}
+
+## Axes
+# Transparent background
+axes.facecolor: none
+axes.edgecolor: black
+axes.linewidth: 1
+axes.grid: False
+axes.spines.top: False
+axes.spines.right: False
+axes.autolimit_mode: round_numbers  # Round limits to nearest "nice" number
+axes.formatter.use_mathtext: True
+# Enable scientific notation when the order of magnitude is greater than or equal to 3 or less than or equal to -3
+axes.formatter.limits: -3, 3
+xtick.bottom: True
+ytick.left: True
+
+## Legend
+# Make the legend appear outside of the plot to the right
+# Legend positioning - outside top right
+legend.loc: best
+#legend.bbox_to_anchor: 1.02, 1.0  # Need to do this in code:  ax.legend(bbox_to_anchor=(1.02, 1.0))
+legend.borderaxespad: 0
+
+# Multiple legends stack vertically
+legend.frameon: False
+legend.fancybox: False
+
+## Figure settings
+figure.dpi: 250  # Higher resolution
+figure.facecolor: white  # Transparent background
+figure.edgecolor: white  # Transparent edge
+figure.constrained_layout.use: True  # Automatically adjust subplot parameters to give specified padding
+figure.figsize: 8, 6  # Default figure size in inches
+
+## Images
+image.aspect: auto  # Automatic aspect ratio
+# Use a greyscale colormap by default to images
+image.cmap: Greys_r  # Reversed greyscale
+
+## Error bar plots
+errorbar.capsize: 5  # Length of the error bar caps in pixels
+
+## Histograms
+hist.bins: auto  # Automatic binning strategy
+
+# Saving
+# No background when saving figures
+savefig.transparent: True
+savefig.dpi: 450  # Higher resolution for saved figures
+savefig.format: pdf  # Default format for saving figures
+svg.fonttype: none  # Keep text as text in SVGs (path coverts to paths, but makes it difficult to edit text)
+pdf.fonttype: 42  # Use Type 42 (TrueType) fonts in PDFs (do not convert to paths)
+ps.fonttype: 42  # Use Type 42 (TrueType) fonts in PS (do not convert to paths)
+# pdf.use14corefonts: True  # Use the 14 core PDF fonts

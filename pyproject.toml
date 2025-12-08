@@ -1,0 +1,31 @@
+[project]
+name = "buencolors"
+version = "0.1.0"
+description = "A pythonic port of the BuenColors R library for handy color palettes."
+requires-python = ">=3.11"
+dependencies = [
+    "matplotlib>=3.9.0",
+    "numpy>=2.0.1",
+    "pandas>=2.3.0",
+    "scipy>=1.14.0",
+]
+
+[build-system]
+requires = ["uv_build"]
+build-backend = "uv_build"
+# Alows us to use:
+## 1. Bump the version using uv
+#uv version --bump patch
+#
+## 2. Extract the new version for tagging
+#NEW_VERSION=$(uv version)
+#
+## 3. Commit the change (the automatic fill)
+#git commit -am "chore(release): bump version to $NEW_VERSION"
+#
+## 4. Create the git tag
+#git tag "v$NEW_VERSION"
+#
+## 5. Build the artifacts
+#uv build
+
