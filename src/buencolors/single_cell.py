@@ -1,4 +1,6 @@
 import matplotlib.lines as mlines
+import matplotlib.pyplot as plt
+from matplotlib.colors import to_rgba
 
 from .helpers import eject_legend, shuffle
 
@@ -11,6 +13,8 @@ except ImportError:
 if ANNDATA_AVAILABLE:
     try:
         import scanpy as sc
+        import numpy as np
+        import scipy
         SCANPY_AVAILABLE = True
     except ImportError:
         SCANPY_AVAILABLE = False
@@ -18,7 +22,14 @@ else:
     SCANPY_AVAILABLE = False
 
 
-def clean_umap(adata, color, ax=None, axis_len=0.2, thickness=3.0, **kwargs):
+def clean_umap(adata,
+               color,
+               outline_style=False,
+               ax=None,
+               axis_len=0.2,
+               thickness=3.0,
+               outline_width=(0.3, 0.05),
+               **kwargs):
     """Plot a clean UMAP with minimal decorations and custom axis indicators.
 
     Plots a Scanpy UMAP with no borders/ticks, but adds a small 'L' shaped
@@ -32,12 +43,17 @@ def clean_umap(adata, color, ax=None, axis_len=0.2, thickness=3.0, **kwargs):
         AnnData object containing the UMAP coordinates
     color : str
         Column in adata.obs or gene name to color cells by
+    outline_style: bool
+        If true, generate an outline around groups of points, similar to scvelo-style UMAPs.
     ax : plt.Axes, optional
         Existing matplotlib axis. If None, creates a new axis.
     axis_len : float, optional
         Length of the custom axis arrows in relative axes coordinates (0-1). Default is 0.2.
     thickness : float, optional
         Line width of the custom axes. Default is 3.0.
+    outline_width : tuple(float, float), optional
+        Tuple specifying the width of the outline and gap as a fraction of point radius (w1, w2).
+        Only used if outline_style is True.
     **kwargs
         Additional keyword arguments passed to sc.pl.umap
 
@@ -58,6 +74,9 @@ def clean_umap(adata, color, ax=None, axis_len=0.2, thickness=3.0, **kwargs):
     >>> buencolors.clean_umap(adata, color='louvain')
     >>> plt.show()
     >>>
+    >>> # Plot clean UMAP with scVelo-style outlines
+    >>> buencolors.clean_umap(adata, color='louvain', outline_style=True)
+    >>>
     >>> # Customize axis length and thickness
     >>> buencolors.clean_umap(adata, color='louvain', axis_len=0.3, thickness=4.0)
     >>> plt.show()
@@ -77,7 +96,65 @@ def clean_umap(adata, color, ax=None, axis_len=0.2, thickness=3.0, **kwargs):
     # 1. Plot base UMAP with frame disabled
     # We will first shuffle the data to avoid non-random cell ordering issues
     adata = shuffle(adata.copy())
-    ax = sc.pl.umap(adata, color=color, show=False, frameon=False, ax=ax, **kwargs)
+
+    # For full-outline mode, delegate to scanpy's own add_outline so all three scatter
+    # layers (bg, gap, main) are drawn in one pass with identical coordinates, marker
+    # type, and rasterization — guaranteeing pixel-perfect centering.
+    if outline_style is True:
+        ax = sc.pl.umap(adata, color=color, show=False, frameon=False, ax=ax,
+                        add_outline=True, outline_width=outline_width, **kwargs)
+    else:
+        ax = sc.pl.umap(adata, color=color, show=False, frameon=False, ax=ax, **kwargs)
+
+    # Selective highlighting: dim non-group cells and draw scVelo-style rings only
+    # around the highlighted groups.
+    if isinstance(outline_style, (str, list)):
+        groups = [outline_style] if isinstance(outline_style, str) else outline_style
+
+        cats = adata.obs[color].cat.categories
+        color_dict = dict(zip(cats, adata.uns[f"{color}_colors"]))
+        highlight_colors = set(color_dict[g] for g in groups)
+
+        x = y = mask = s = None
+        for col in ax.collections:
+            fc = col.get_facecolor()
+            if len(fc) == len(adata):
+                # Read coordinates and size directly from the plotted collection
+                # so that mask indices align with the correct (x, y) positions
+                offsets = col.get_offsets()
+                x, y = np.array(offsets[:, 0]), np.array(offsets[:, 1])
+                sizes = col.get_sizes()
+                s = float(sizes[0]) if len(sizes) == 1 else float(np.mean(sizes))
+
+                highlight_rgba = np.array([to_rgba(c) for c in highlight_colors])
+                is_highlighted = np.zeros(len(fc), dtype=bool)
+                for hc in highlight_rgba:
+                    is_highlighted |= np.all(np.isclose(fc[:, :3], hc[:3], atol=0.01), axis=1)
+                fc[~is_highlighted] = fc[~is_highlighted] * 0.3 + 0.7
+                col.set_facecolor(fc)
+                col.set_zorder(3)  # push main collection to top
+                mask = is_highlighted
+                break
+
+        if s is None:
+            s = kwargs.get("size", 120000 / adata.shape[0])
+        if x is None:
+            coords = adata.obsm['X_umap']
+            x, y = coords[:, 0], coords[:, 1]
+            mask = np.ones(len(x), dtype=bool)
+
+        point = np.sqrt(s)
+        w1, w2 = outline_width
+        gp_size = (2 * (point * w2) + point) ** 2
+        bg_size = (2 * (point * w1) + np.sqrt(gp_size)) ** 2
+        # Match scanpy's rasterization setting and suppress edges, same as scanpy's
+        # add_outline implementation, to ensure sub-pixel rendering is consistent.
+        rasterized = sc.settings._vector_friendly
+        ax.scatter(x[mask], y[mask], s=bg_size, marker=".", c="black", zorder=1,
+                   edgecolors="none", rasterized=rasterized)
+        ax.scatter(x[mask], y[mask], s=gp_size, marker=".", c="white", zorder=2,
+                   edgecolors="none", rasterized=rasterized)
+        # main collection at zorder=3 sits on top of rings
 
     # 2. Ensure all standard decorations are gone (in case frameon misses something)
     ax.set_xlabel("")

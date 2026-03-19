@@ -197,14 +197,39 @@ with plt.style.context('pretty-plot'):
 Features of `clean_umap()`:
 
 - **Minimal decorations**: No borders, ticks, or frame
-
 - **Custom L-shaped axis indicators**: Small arrows showing UMAP dimensions
-
 - **Auto-ejected legend**: Automatically positioned to the right to avoid obscuring data
-
 - **Shuffled cells**: Randomizes plotting order to avoid non-random ordering artifacts
+- **scVelo-style outlines**: Concentric black/white rings around points
 
 ![Clean UMAP Example](https://raw.githubusercontent.com/austinv11/PyBuenColors/master/figures/single_cell_clean_umap.png)
+
+### scVelo-Style Outlines
+
+Add concentric outline rings to UMAP points via the `outline_style` parameter:
+
+```python
+# Outline every cell
+bc.clean_umap(adata, color='louvain', outline_style=True)
+
+# Highlight one group — all other cells are dimmed
+bc.clean_umap(adata, color='louvain', outline_style='CD4 T cells')
+
+# Highlight multiple groups
+bc.clean_umap(adata, color='louvain', outline_style=['NK cells', 'CD8 T cells'])
+
+# Adjust ring widths: (black_bg_fraction, white_gap_fraction)
+bc.clean_umap(adata, color='louvain', outline_style=True, outline_width=(0.5, 0.1))
+```
+
+`outline_style` accepts:
+
+| Value | Effect |
+|---|---|
+| `False` (default) | No outlines |
+| `True` | Outline every cell |
+| `"Group name"` | Dim all cells, outline the named group |
+| `["G1", "G2"]` | Dim all cells, outline the listed groups |
 
 ## Examples
 

@@ -62,6 +62,40 @@ def generate_clean_umap_example(output_dir):
         plt.close()
 
 
+def generate_umap_outline_example(output_dir):
+    """Generate clean_umap() example with scVelo-style outlines."""
+    print("Generating clean UMAP example with outlines...")
+
+    # Load the preprocessed PBMC3k dataset
+    adata = sc.datasets.pbmc3k_processed()
+
+    # Create figure with clean UMAP and outlines
+    with plt.style.context('pretty-plot'):
+        fig = plt.figure(figsize=(10, 8))
+        ax = bc.clean_umap(adata, color='louvain', palette='lawhoops', outline_style=True)
+
+        # Add a title
+        fig.suptitle('PBMC3k Single-Cell UMAP - With Outlines',
+                     fontsize=14, fontweight='bold', y=0.98)
+
+        output_path = output_dir / 'single_cell_clean_umap_outlines.png'
+        plt.savefig(output_path, dpi=150, bbox_inches='tight', facecolor='white')
+        print(f"✓ Generated: {output_path}")
+        plt.close()
+
+        fig = plt.figure(figsize=(10, 8))
+        ax = bc.clean_umap(adata, color='louvain', palette='lawhoops', outline_style='CD4 T cells')
+
+        # Add a title
+        fig.suptitle('PBMC3k Single-Cell UMAP - With Outline Callout',
+                     fontsize=14, fontweight='bold', y=0.98)
+
+        output_path = output_dir / 'single_cell_clean_umap_outlines_callout.png'
+        plt.savefig(output_path, dpi=150, bbox_inches='tight', facecolor='white')
+        print(f"✓ Generated: {output_path}")
+        plt.close()
+
+
 def main():
     """Main function to generate all single-cell figures."""
     print("=" * 60)
@@ -76,6 +110,7 @@ def main():
 
     # Generate examples
     generate_clean_umap_example(output_dir)
+    generate_umap_outline_example(output_dir)
 
     print("\n" + "=" * 60)
     print("All single-cell figures generated successfully!")

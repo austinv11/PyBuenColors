@@ -59,7 +59,7 @@ legend.frameon: False
 legend.fancybox: False
 
 ## Figure settings
-figure.dpi: 250  # Higher resolution
+figure.dpi: 500  # Higher resolution
 figure.facecolor: white  # Transparent background
 figure.edgecolor: white  # Transparent edge
 figure.constrained_layout.use: True  # Automatically adjust subplot parameters to give specified padding
