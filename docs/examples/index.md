@@ -14,6 +14,8 @@ Comprehensive demonstration of utility functions for creating publication-ready 
 - **`get_density()`** - Compute point density for colored scatter plots
 - **`shuffle()`** - Randomize data order to prevent plotting artifacts
 - **`number_to_color()`** - Map numerical values to colors from any palette
+- **`eject_colorbar()`** - Add a colorbar outside the plot area for images and scatter plots
+- **`grab_colorbar()`** - Extract colorbars to separate figures for independent saving
 
 ### [Color Palettes](palettes_demo.ipynb)
 

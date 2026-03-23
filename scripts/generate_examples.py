@@ -278,6 +278,74 @@ def generate_number_to_color_example(output_dir):
         plt.close()
 
 
+def generate_eject_colorbar_example(output_dir):
+    """Generate eject_colorbar() utility example."""
+    print("Generating eject_colorbar example...")
+
+    np.random.seed(42)
+    with plt.style.context('pretty-plot'):
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5))
+
+        x = np.random.randn(800)
+        y = np.random.randn(800)
+        values = x ** 2 + y ** 2
+
+        # Without eject_colorbar (no colorbar)
+        ax1.scatter(x, y, c=values, cmap='solar_flare', s=20, alpha=0.7)
+        ax1.set_title('No Colorbar')
+        ax1.set_xlabel('x')
+        ax1.set_ylabel('y')
+
+        # With eject_colorbar
+        sc = ax2.scatter(x, y, c=values, cmap='solar_flare', s=20, alpha=0.7)
+        buencolors.eject_colorbar(ax2)
+        ax2.set_title('eject_colorbar() - Colorbar Outside Plot')
+        ax2.set_xlabel('x')
+        ax2.set_ylabel('y')
+
+        output_path = output_dir / 'util_eject_colorbar.png'
+        plt.savefig(output_path, dpi=150, bbox_inches='tight', facecolor='white')
+        print(f"✓ Generated: {output_path}")
+        plt.close()
+
+
+def generate_grab_colorbar_example(output_dir):
+    """Generate grab_colorbar() utility example."""
+    print("Generating grab_colorbar example...")
+
+    np.random.seed(42)
+    with plt.style.context('pretty-plot'):
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5))
+
+        x = np.random.randn(800)
+        y = np.random.randn(800)
+        values = x ** 2 + y ** 2
+
+        # Left: remove=True (default)
+        sc1 = ax1.scatter(x, y, c=values, cmap='ocean_earth', s=20, alpha=0.7)
+        fig.colorbar(sc1, ax=ax1, label='Distance²')
+        ax1.set_title('Before grab_colorbar(remove=True)')
+        ax1.set_xlabel('x')
+        ax1.set_ylabel('y')
+        cb_fig1 = buencolors.grab_colorbar(ax1, remove=True)
+
+        # Right: remove=False
+        sc2 = ax2.scatter(x, y, c=values, cmap='ocean_earth', s=20, alpha=0.7)
+        fig.colorbar(sc2, ax=ax2, label='Distance²')
+        ax2.set_title('grab_colorbar(remove=False)')
+        ax2.set_xlabel('x')
+        ax2.set_ylabel('y')
+        cb_fig2 = buencolors.grab_colorbar(ax2, remove=False)
+
+        output_path = output_dir / 'util_grab_colorbar.png'
+        plt.savefig(output_path, dpi=150, bbox_inches='tight', facecolor='white')
+        print(f"✓ Generated: {output_path}")
+        plt.close()
+
+        plt.close(cb_fig1)
+        plt.close(cb_fig2)
+
+
 def main():
     """Main execution function."""
     print("BuenColors Example Figure Generator")
@@ -297,6 +365,8 @@ def main():
     generate_density_example(output_dir)
     generate_shuffle_example(output_dir)
     generate_number_to_color_example(output_dir)
+    generate_eject_colorbar_example(output_dir)
+    generate_grab_colorbar_example(output_dir)
 
     print()
     print("=" * 50)
@@ -312,6 +382,8 @@ def main():
     print("  ![get_density](figures/util_density.png)")
     print("  ![shuffle](figures/util_shuffle.png)")
     print("  ![number_to_color](figures/util_number_to_color.png)")
+    print("  ![eject_colorbar](figures/util_eject_colorbar.png)")
+    print("  ![grab_colorbar](figures/util_grab_colorbar.png)")
     print()
 
 

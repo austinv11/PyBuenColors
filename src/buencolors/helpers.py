@@ -61,55 +61,6 @@ def eject_legend(ax: Optional[plt.Axes] = None) -> None:
     ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0.)
 
 
-def rotate_discrete_xticks(ax: Optional[plt.Axes] = None, rotation: float = 45) -> None:
-    """Rotate the x-tick labels for discrete axes with proper alignment.
-
-    This will rotate the x-tick labels and ensure that the ending of the labels
-    are directly under the ticks for better readability.
-
-    Parameters
-    ----------
-    ax : plt.Axes, optional
-        The axes to modify. If None, uses the current axes.
-    rotation : float, optional
-        The angle of rotation for the x-tick labels. Default is 45 degrees.
-
-    Returns
-    -------
-    None
-
-    Examples
-    --------
-    >>> import matplotlib.pyplot as plt
-    >>> import buencolors
-    >>>
-    >>> # Bar plot with long category names
-    >>> categories = ['First Category', 'Second Category', 'Third Category',
-    ...               'Fourth Category', 'Fifth Category']
-    >>> values = [23, 45, 56, 78, 32]
-    >>>
-    >>> plt.bar(categories, values)
-    >>> buencolors.rotate_discrete_xticks
-    >>> plt.show()
-    >>>
-    >>> # Custom rotation angle
-    >>> plt.bar(categories, values)
-    >>> buencolors.rotate_discrete_xticks(rotation=60)
-    >>> plt.show()
-    >>>
-    >>> # Use with specific axes
-    >>> fig, ax = plt.subplots()
-    >>> ax.bar(categories, values)
-    >>> buencolors.rotate_discrete_xticks(ax, rotation=30)
-    >>> plt.show()
-    """
-    if ax is None:
-        ax = plt.gca()
-    for label in ax.get_xticklabels():
-        label.set_rotation(rotation)
-        label.set_ha('right')
-
-
 def grab_legend(ax: Optional[plt.Axes] = None, remove: bool = True) -> plt.Figure:
     """Grab the legend from the axes and return it in a new figure for external saving or modification.
 
@@ -208,6 +159,207 @@ def grab_legend(ax: Optional[plt.Axes] = None, remove: bool = True) -> plt.Figur
 
     return fig
 
+
+def _get_mappable(ax: plt.Axes):
+    """Get the primary scalar mappable from an axes."""
+    images = ax.get_images()
+    if images:
+        return images[0]
+    for collection in ax.collections:
+        if hasattr(collection, 'get_array') and collection.get_array() is not None:
+            return collection
+    raise ValueError("No mappable found on the provided axes.")
+
+
+def eject_colorbar(
+    ax: Optional[plt.Axes] = None,
+    location: str = 'right'
+) -> 'plt.colorbar.Colorbar':
+    """Eject the colorbar to the outside of the axes.
+
+    Creates a colorbar placed outside the plot area for the axes' primary mappable
+    (image or colored collection). If a colorbar already exists, it is removed and
+    recreated. Analogous to eject_legend() but for colorbars.
+
+    Parameters
+    ----------
+    ax : plt.Axes, optional
+        The axes to create a colorbar for. If None, uses the current axes.
+    location : str, optional
+        Location of the colorbar: 'right', 'left', 'top', or 'bottom'. Default is 'right'.
+
+    Returns
+    -------
+    matplotlib.colorbar.Colorbar
+        The created colorbar.
+
+    Examples
+    --------
+    >>> import matplotlib.pyplot as plt
+    >>> import numpy as np
+    >>> import buencolors
+    >>>
+    >>> # Scatter plot colored by value
+    >>> x = np.random.randn(500)
+    >>> y = np.random.randn(500)
+    >>> values = x ** 2 + y ** 2
+    >>> plt.scatter(x, y, c=values, cmap='solar_flare')
+    >>> buencolors.eject_colorbar()
+    >>> plt.show()
+    >>>
+    >>> # Use with a specific axes
+    >>> fig, ax = plt.subplots()
+    >>> ax.imshow(np.random.rand(10, 10), cmap='brewer_spectra')
+    >>> buencolors.eject_colorbar(ax)
+    >>> plt.show()
+    """
+    if ax is None:
+        ax = plt.gca()
+    mappable = _get_mappable(ax)
+    existing_cb = getattr(mappable, 'colorbar', None)
+    if existing_cb is not None:
+        existing_cb.remove()
+    return ax.figure.colorbar(mappable, ax=ax, location=location)
+
+
+def grab_colorbar(
+    ax: Optional[plt.Axes] = None,
+    remove: bool = True,
+    orientation: str = 'vertical'
+) -> plt.Figure:
+    """Grab the colorbar and return it in a new figure for external saving or modification.
+
+    This is useful for creating separate colorbar files for publications or presentations,
+    or for pairing a colorbar with multiple panels. Analogous to grab_legend() but for
+    colorbars.
+
+    Parameters
+    ----------
+    ax : plt.Axes, optional
+        The axes to grab the colorbar from. If None, uses the current axes.
+    remove : bool, optional
+        If True (default), remove the colorbar from the original figure after extraction.
+        If False, keep the colorbar on the original figure.
+    orientation : str, optional
+        Orientation of the colorbar in the new figure: 'vertical' or 'horizontal'.
+        Default is 'vertical'.
+
+    Returns
+    -------
+    plt.Figure
+        A new figure containing only the colorbar.
+
+    Examples
+    --------
+    >>> import matplotlib.pyplot as plt
+    >>> import numpy as np
+    >>> import buencolors
+    >>>
+    >>> # Create a scatter plot and extract its colorbar
+    >>> x = np.random.randn(500)
+    >>> y = np.random.randn(500)
+    >>> values = x ** 2 + y ** 2
+    >>> sc = plt.scatter(x, y, c=values, cmap='solar_flare')
+    >>> plt.colorbar(sc, label='Distance from origin')
+    >>>
+    >>> # Extract and save the colorbar separately
+    >>> cb_fig = buencolors.grab_colorbar()
+    >>> cb_fig.savefig('colorbar.pdf', bbox_inches='tight')
+    >>> plt.savefig('scatter.pdf')  # Saved without colorbar
+    >>>
+    >>> # Keep colorbar on original while also grabbing it
+    >>> fig, ax = plt.subplots()
+    >>> im = ax.imshow(np.random.rand(10, 10), cmap='brewer_spectra')
+    >>> fig.colorbar(im, ax=ax, label='Value')
+    >>> cb_fig = buencolors.grab_colorbar(ax, remove=False)
+    >>> cb_fig.savefig('colorbar_only.png', dpi=300, bbox_inches='tight')
+    >>> plt.show()  # Original plot still has colorbar
+    >>>
+    >>> # Horizontal colorbar in the new figure
+    >>> fig, ax = plt.subplots()
+    >>> im = ax.imshow(np.random.rand(10, 10), cmap='solar_flare')
+    >>> fig.colorbar(im, ax=ax)
+    >>> cb_fig = buencolors.grab_colorbar(ax, orientation='horizontal')
+    >>> cb_fig.savefig('colorbar_h.pdf', bbox_inches='tight')
+    """
+    if ax is None:
+        ax = plt.gca()
+    mappable = _get_mappable(ax)
+    existing_cb = getattr(mappable, 'colorbar', None)
+
+    label = ''
+    bbox = None
+    if existing_cb is not None:
+        cb_ax = existing_cb.ax
+        ax.figure.canvas.draw()
+        bbox = cb_ax.get_window_extent().transformed(ax.figure.dpi_scale_trans.inverted())
+        label = cb_ax.get_ylabel() if existing_cb.orientation == 'vertical' else cb_ax.get_xlabel()
+        if remove:
+            existing_cb.remove()
+
+    if bbox is not None:
+        if orientation == 'vertical':
+            figsize = (max(bbox.width, 0.4), max(bbox.height, 1.5))
+        else:
+            figsize = (max(bbox.width, 1.5), max(bbox.height, 0.4))
+    else:
+        figsize = (0.5, 3) if orientation == 'vertical' else (3, 0.5)
+
+    fig, cb_ax_new = plt.subplots(figsize=figsize)
+    cb = fig.colorbar(mappable, cax=cb_ax_new, orientation=orientation)
+    if label:
+        cb.set_label(label)
+
+    return fig
+
+
+def rotate_discrete_xticks(ax: Optional[plt.Axes] = None, rotation: float = 45) -> None:
+    """Rotate the x-tick labels for discrete axes with proper alignment.
+
+    This will rotate the x-tick labels and ensure that the ending of the labels
+    are directly under the ticks for better readability.
+
+    Parameters
+    ----------
+    ax : plt.Axes, optional
+        The axes to modify. If None, uses the current axes.
+    rotation : float, optional
+        The angle of rotation for the x-tick labels. Default is 45 degrees.
+
+    Returns
+    -------
+    None
+
+    Examples
+    --------
+    >>> import matplotlib.pyplot as plt
+    >>> import buencolors
+    >>>
+    >>> # Bar plot with long category names
+    >>> categories = ['First Category', 'Second Category', 'Third Category',
+    ...               'Fourth Category', 'Fifth Category']
+    >>> values = [23, 45, 56, 78, 32]
+    >>>
+    >>> plt.bar(categories, values)
+    >>> buencolors.rotate_discrete_xticks()
+    >>> plt.show()
+    >>>
+    >>> # Custom rotation angle
+    >>> plt.bar(categories, values)
+    >>> buencolors.rotate_discrete_xticks(rotation=60)
+    >>> plt.show()
+    >>>
+    >>> # Use with specific axes
+    >>> fig, ax = plt.subplots()
+    >>> ax.bar(categories, values)
+    >>> buencolors.rotate_discrete_xticks(ax, rotation=30)
+    >>> plt.show()
+    """
+    if ax is None:
+        ax = plt.gca()
+    for label in ax.get_xticklabels():
+        label.set_rotation(rotation)
+        label.set_ha('right')
 
 def get_density(x: ArrayLike, y: ArrayLike, n: int = 200) -> np.ndarray:
     """Compute the density of points in a grid.

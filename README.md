@@ -165,6 +165,47 @@ colors = bc.number_to_color(values, palette='Zissou')
 
 ![Number to Color Example](https://raw.githubusercontent.com/austinv11/PyBuenColors/master/figures/util_number_to_color.png)
 
+#### Eject Colorbar
+
+Add a colorbar outside the plot area for images or colored scatter plots:
+
+```python
+x = np.random.randn(500)
+y = np.random.randn(500)
+values = x ** 2 + y ** 2
+plt.scatter(x, y, c=values, cmap='solar_flare')
+
+# Eject colorbar to the right (default)
+bc.eject_colorbar()
+
+# Or to another side
+bc.eject_colorbar(location='bottom')
+```
+
+![Eject Colorbar Example](https://raw.githubusercontent.com/austinv11/PyBuenColors/master/figures/util_eject_colorbar.png)
+
+#### Grab Colorbar
+
+Extract a colorbar to a separate figure for independent saving or publication:
+
+```python
+sc = plt.scatter(x, y, c=values, cmap='ocean_earth')
+plt.colorbar(sc, label='Distance²')
+
+# Extract colorbar to separate figure (removes from original by default)
+cb_fig = bc.grab_colorbar()
+cb_fig.savefig('colorbar.pdf', bbox_inches='tight')
+plt.savefig('plot.pdf')  # Plot saved without colorbar
+
+# Or keep colorbar on original
+cb_fig = bc.grab_colorbar(remove=False)
+
+# Horizontal orientation in the new figure
+cb_fig = bc.grab_colorbar(orientation='horizontal')
+```
+
+![Grab Colorbar Example](https://raw.githubusercontent.com/austinv11/PyBuenColors/master/figures/util_grab_colorbar.png)
+
 ## Single-Cell Analysis
 
 BuenColors provides specialized functions for single-cell analysis visualization, designed to work seamlessly with Scanpy and AnnData objects.

@@ -2,7 +2,7 @@ import matplotlib.style
 import matplotlib as mpl
 from pathlib import Path
 from .palettes import register_cmaps, get_palette, display_palette, list_palettes, get_registered_cmaps
-from .helpers import eject_legend, rotate_discrete_xticks, grab_legend, get_density, shuffle, number_to_color
+from .helpers import eject_legend, rotate_discrete_xticks, grab_legend, get_density, shuffle, number_to_color, eject_colorbar, grab_colorbar
 from .single_cell import clean_umap
 
 # -----------------------------------------------------------------------------
@@ -48,5 +48,7 @@ __all__ = (
     "display_palette",
     "list_palettes",
     "get_registered_cmaps",
+    "eject_colorbar",
+    "grab_colorbar",
     "clean_umap",
 )
