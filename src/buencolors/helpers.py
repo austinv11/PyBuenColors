@@ -6,6 +6,7 @@ from typing import TypeVar, overload, Optional, Union
 from numpy.typing import ArrayLike
 import matplotlib.colors as mcolors
 import matplotlib.cm as cm
+from matplotlib.cm import ScalarMappable
 
 try:
     import anndata  # noqa: F401
@@ -141,8 +142,9 @@ def grab_legend(ax: Optional[plt.Axes] = None, remove: bool = True) -> plt.Figur
     if remove:
         legend.remove()
 
-    # Create a new figure for the legend with appropriate size
-    fig, ax_legend = plt.subplots(figsize=(bbox.width, bbox.height))
+    # Create a new figure for the legend with appropriate size.
+    # Use layout='none' to avoid constrained_layout collapsing tiny figures.
+    fig, ax_legend = plt.subplots(figsize=(bbox.width, bbox.height), layout='none')
 
     # Hide the axis
     ax_legend.axis('off')
@@ -305,8 +307,16 @@ def grab_colorbar(
     else:
         figsize = (0.5, 3) if orientation == 'vertical' else (3, 0.5)
 
-    fig, cb_ax_new = plt.subplots(figsize=figsize)
-    cb = fig.colorbar(mappable, cax=cb_ax_new, orientation=orientation)
+    # Use layout='none' to avoid constrained_layout collapsing tiny figures.
+    fig, cb_ax_new = plt.subplots(figsize=figsize, layout='none')
+
+    # Create a detached ScalarMappable with the same norm/cmap to avoid a
+    # cross-figure warning when the mappable belongs to the original figure.
+    detached = ScalarMappable(norm=mappable.norm, cmap=mappable.cmap)
+    arr = mappable.get_array()
+    detached.set_array([] if arr is None else arr)
+
+    cb = fig.colorbar(detached, cax=cb_ax_new, orientation=orientation)
     if label:
         cb.set_label(label)
 

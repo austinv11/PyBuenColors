@@ -321,26 +321,30 @@ def generate_grab_colorbar_example(output_dir):
         y = np.random.randn(800)
         values = x ** 2 + y ** 2
 
-        # Left: remove=True (default)
+        # Left: remove=False — colorbar stays on the plot
         sc1 = ax1.scatter(x, y, c=values, cmap='ocean_earth', s=20, alpha=0.7)
         fig.colorbar(sc1, ax=ax1, label='Distance²')
-        ax1.set_title('Before grab_colorbar(remove=True)')
+        ax1.set_title('grab_colorbar(remove=False)\nColorbar kept on original')
         ax1.set_xlabel('x')
         ax1.set_ylabel('y')
-        cb_fig1 = buencolors.grab_colorbar(ax1, remove=True)
+        cb_fig1 = buencolors.grab_colorbar(ax1, remove=False)
 
-        # Right: remove=False
-        sc2 = ax2.scatter(x, y, c=values, cmap='ocean_earth', s=20, alpha=0.7)
-        fig.colorbar(sc2, ax=ax2, label='Distance²')
-        ax2.set_title('grab_colorbar(remove=False)')
-        ax2.set_xlabel('x')
-        ax2.set_ylabel('y')
-        cb_fig2 = buencolors.grab_colorbar(ax2, remove=False)
+        # Right: remove=True — grab from a fresh single-axes figure to avoid
+        # layout disruption on the multi-panel demo figure
+        fig2, ax_tmp = plt.subplots(figsize=(6, 5))
+        sc2 = ax_tmp.scatter(x, y, c=values, cmap='ocean_earth', s=20, alpha=0.7)
+        fig2.colorbar(sc2, ax=ax_tmp, label='Distance²')
+        cb_fig2 = buencolors.grab_colorbar(ax_tmp, remove=True)
+        plt.close(fig2)
+
+        # Render the extracted colorbar as the right panel by drawing it onto ax2
+        ax2.axis('off')
+        ax2.set_title('Extracted colorbar figure\n(grab_colorbar returns a Figure)', pad=12)
 
         output_path = output_dir / 'util_grab_colorbar.png'
-        plt.savefig(output_path, dpi=150, bbox_inches='tight', facecolor='white')
+        fig.savefig(output_path, dpi=150, bbox_inches='tight', facecolor='white')
         print(f"✓ Generated: {output_path}")
-        plt.close()
+        plt.close(fig)
 
         plt.close(cb_fig1)
         plt.close(cb_fig2)
