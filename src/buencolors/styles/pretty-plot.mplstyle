@@ -27,6 +27,11 @@ patch.edgecolor: black
 # Same as default, but use Helvetica or Arial first if available
 font.sans-serif: Helvetica, Arial, DejaVu Sans, Bitstream Vera Sans, Computer Modern Sans Serif, Lucida Grande, Verdana, Geneva, Lucid, Avant Garde, sans-serif
 font.size: 12
+text.color: black
+axes.labelcolor: black
+xtick.color: black
+ytick.color: black
+axes.titlecolor: black
 
 ## Latex
 text.usetex: False
