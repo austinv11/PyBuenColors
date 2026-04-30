@@ -101,14 +101,18 @@ def clean_umap(adata,
     # layers (bg, gap, main) are drawn in one pass with identical coordinates, marker
     # type, and rasterization — guaranteeing pixel-perfect centering.
     if outline_style is True:
-        ax = sc.pl.umap(adata, color=color, show=False, frameon=False, ax=ax,
-                        add_outline=True, outline_width=outline_width, **kwargs)
+        result = sc.pl.umap(adata, color=color, show=False, frameon=False, ax=ax,
+                            add_outline=True, outline_width=outline_width, **kwargs)
     else:
-        ax = sc.pl.umap(adata, color=color, show=False, frameon=False, ax=ax, **kwargs)
+        result = sc.pl.umap(adata, color=color, show=False, frameon=False, ax=ax, **kwargs)
+
+    # sc.pl.umap returns a list when color is a list; normalize to list for uniform handling
+    axes_list = result if isinstance(result, list) else [result]
+    ax = axes_list[0]
 
     # Selective highlighting: dim non-group cells and draw scVelo-style rings only
-    # around the highlighted groups.
-    if isinstance(outline_style, (str, list)):
+    # around the highlighted groups. Only applicable for a single string color.
+    if isinstance(outline_style, (str, list)) and isinstance(color, str):
         groups = [outline_style] if isinstance(outline_style, str) else outline_style
 
         cats = adata.obs[color].cat.categories
@@ -156,65 +160,67 @@ def clean_umap(adata,
                    edgecolors="none", rasterized=rasterized)
         # main collection at zorder=3 sits on top of rings
 
-    # 2. Ensure all standard decorations are gone (in case frameon misses something)
-    ax.set_xlabel("")
-    ax.set_ylabel("")
-    ax.set_xticks([])
-    ax.set_yticks([])
-    # Remove spines
-    for spine in ax.spines.values():
-        spine.set_visible(False)
-    # Set aspect to equal
-    ax.set_aspect('equal')
-    # Set colors of background to transparent
-    ax.set_facecolor('none')
-    ax.figure.patch.set_alpha(0)
-
-    # 3. Eject the legend to the right side of the plot
-    eject_legend(ax)
-
-    # 4. Add Custom Axes (The "L" shape) with arrowheads
-    # We use ax.transAxes so coordinates are relative (0,0 = bottom-left)
-    # Use small offset to prevent arrows from being cut off
+    # 2–5. Apply per-axis decorations to every panel
     offset_x = 0.03
     offset_y = 0.03
+    for _ax in axes_list:
+        # 2. Ensure all standard decorations are gone (in case frameon misses something)
+        _ax.set_xlabel("")
+        _ax.set_ylabel("")
+        _ax.set_xticks([])
+        _ax.set_yticks([])
+        # Remove spines
+        for spine in _ax.spines.values():
+            spine.set_visible(False)
+        # Set aspect to equal
+        _ax.set_aspect('equal')
+        # Set colors of background to transparent
+        _ax.set_facecolor('none')
+        _ax.figure.patch.set_alpha(0)
 
-    # Draw the L-shape using Line2D with markers for arrowheads
-    # Vertical line (UMAP 2) with arrowhead pointing up at the end only
-    line_v = mlines.Line2D([offset_x, offset_x], [offset_y, axis_len + offset_y],
-                           transform=ax.transAxes, color='black', linewidth=thickness,
-                           marker='^', markersize=10, markevery=[1],
-                           markerfacecolor='black', markeredgecolor='black',
-                           solid_capstyle='projecting', solid_joinstyle='miter')
-    # Horizontal line (UMAP 1) with arrowhead pointing right at the end only
-    line_h = mlines.Line2D([offset_x, axis_len + offset_x], [offset_y, offset_y],
-                           transform=ax.transAxes, color='black', linewidth=thickness,
-                           marker='>', markersize=10, markevery=[1],
-                           markerfacecolor='black', markeredgecolor='black',
-                           solid_capstyle='projecting', solid_joinstyle='miter')
+        # 3. Eject the legend to the right side of the plot
+        eject_legend(_ax)
 
-    ax.add_line(line_v)
-    ax.add_line(line_h)
+        # 4. Add Custom Axes (The "L" shape) with arrowheads
+        # We use _ax.transAxes so coordinates are relative (0,0 = bottom-left)
+        # Use small offset to prevent arrows from being cut off
 
+        # Draw the L-shape using Line2D with markers for arrowheads
+        # Vertical line (UMAP 2) with arrowhead pointing up at the end only
+        line_v = mlines.Line2D([offset_x, offset_x], [offset_y, axis_len + offset_y],
+                               transform=_ax.transAxes, color='black', linewidth=thickness,
+                               marker='^', markersize=10, markevery=[1],
+                               markerfacecolor='black', markeredgecolor='black',
+                               solid_capstyle='projecting', solid_joinstyle='miter')
+        # Horizontal line (UMAP 1) with arrowhead pointing right at the end only
+        line_h = mlines.Line2D([offset_x, axis_len + offset_x], [offset_y, offset_y],
+                               transform=_ax.transAxes, color='black', linewidth=thickness,
+                               marker='>', markersize=10, markevery=[1],
+                               markerfacecolor='black', markeredgecolor='black',
+                               solid_capstyle='projecting', solid_joinstyle='miter')
 
-    # 5. Add Labels
-    # Position labels to emulate xlabel/ylabel: centered along each axis, anchored at origin
-    # Horizontal label (UMAP 1) - centered below the horizontal axis
-    ax.text(axis_len/2 + offset_x, offset_y - 0.03, "UMAP 1", transform=ax.transAxes,
-            ha='center', va='top', fontsize=10)
-    # Vertical label (UMAP 2) - centered along vertical axis, rotated 90 degrees
-    ax.text(offset_x - 0.03, axis_len/2 + offset_y, "UMAP 2", transform=ax.transAxes,
-            ha='right', va='center', fontsize=10, rotation=90)
+        _ax.add_line(line_v)
+        _ax.add_line(line_h)
+
+        # 5. Add Labels
+        # Position labels to emulate xlabel/ylabel: centered along each axis, anchored at origin
+        # Horizontal label (UMAP 1) - centered below the horizontal axis
+        _ax.text(axis_len/2 + offset_x, offset_y - 0.03, "UMAP 1", transform=_ax.transAxes,
+                 ha='center', va='top', fontsize=10)
+        # Vertical label (UMAP 2) - centered along vertical axis, rotated 90 degrees
+        _ax.text(offset_x - 0.03, axis_len/2 + offset_y, "UMAP 2", transform=_ax.transAxes,
+                 ha='right', va='center', fontsize=10, rotation=90)
 
     # 6. Add buffer region to prevent arrows and legend from being cut off
     # Use tight_layout with rect parameter to preserve space while keeping aspect ratio
     # Wrap in try/except because tight_layout conflicts with colorbars (gene expression plots)
+    fig = axes_list[0].figure
     try:
-        ax.figure.tight_layout(rect=(0.05, 0.05, 0.95, 0.95))
+        fig.tight_layout(rect=(0.05, 0.05, 0.95, 0.95))
     except RuntimeError:
         # Colorbar present, skip tight_layout
         pass
     # Adjust subplot parameters to ensure nothing is clipped
-    ax.figure.subplots_adjust(left=0.1, bottom=0.1, right=0.85)
+    fig.subplots_adjust(left=0.1, bottom=0.1, right=0.85)
 
-    return ax
+    return axes_list if len(axes_list) > 1 else axes_list[0]
