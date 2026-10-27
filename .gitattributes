@@ -1,0 +1,12 @@
+# Normalize line endings: always LF in the repo and in working copies,
+# regardless of core.autocrlf on the developer machine.
+* text=auto eol=lf
+
+# Binary files
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.whl binary

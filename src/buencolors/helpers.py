@@ -5,7 +5,6 @@ import pandas as pd
 from typing import TypeVar, overload, Optional, Union
 from numpy.typing import ArrayLike
 import matplotlib.colors as mcolors
-import matplotlib.cm as cm
 from matplotlib.cm import ScalarMappable
 
 try:
@@ -644,7 +643,7 @@ def number_to_color(
 
     # Get the colormap
     if isinstance(palette, str):
-        cmap = cm.get_cmap(palette)
+        cmap = plt.get_cmap(palette)
     else:
         cmap = palette
 

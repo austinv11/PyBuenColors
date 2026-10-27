@@ -1,5 +1,4 @@
 import matplotlib as mpl
-import matplotlib.cm as cm
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 from matplotlib.colors import LinearSegmentedColormap, ListedColormap
@@ -271,7 +270,7 @@ def get_palette(
     if n > len(palette_colors):
         # Need to interpolate - use the registered colormap
         cmap_name = f"{name}_r" if reverse else name
-        cmap = cm.get_cmap(cmap_name)
+        cmap = mpl.colormaps[cmap_name]
         indices = np.linspace(0, 1, n)
         colors = cmap(indices)
         if as_hex:

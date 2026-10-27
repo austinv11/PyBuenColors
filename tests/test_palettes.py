@@ -1,8 +1,8 @@
 import pytest
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib
 import matplotlib.colors as mcolors
-import matplotlib.cm as cm
 from buencolors.palettes import (
     jdb_palettes, register_cmaps, get_palette, display_palette,
     list_palettes, get_registered_cmaps
@@ -25,7 +25,7 @@ class TestPaletteRegistry:
         palette_name = "Zissou"
         expected_colors = jdb_palettes[palette_name]
 
-        cmap = cm.get_cmap(palette_name)
+        cmap = matplotlib.colormaps[palette_name]
         # Sample at evenly spaced points
         n = len(expected_colors)
         indices = np.linspace(0, 1, n)
@@ -40,8 +40,8 @@ class TestPaletteRegistry:
         """Test that reversed colormaps are actually reversed."""
         palette_name = "solar_flare"
 
-        cmap = cm.get_cmap(palette_name)
-        cmap_r = cm.get_cmap(f"{palette_name}_r")
+        cmap = matplotlib.colormaps[palette_name]
+        cmap_r = matplotlib.colormaps[f"{palette_name}_r"]
 
         # First color of normal should match last color of reversed
         color_start = mcolors.to_hex(cmap(0.0))

@@ -278,9 +278,8 @@ class TestNumberToColor:
 
     def test_number_to_color_with_cmap_object(self):
         """Test number_to_color with a Colormap object."""
-        import matplotlib.cm as cm
         values = [1, 2, 3, 4, 5]
-        cmap = cm.get_cmap('coolwarm')
+        cmap = plt.get_cmap('coolwarm')
         colors = number_to_color(values, cmap)
 
         assert len(colors) == 5

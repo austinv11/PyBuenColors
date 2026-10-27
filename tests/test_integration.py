@@ -1,6 +1,9 @@
+import importlib
+import warnings
+
 import pytest
+import matplotlib
 import matplotlib.pyplot as plt
-import matplotlib.style as mplstyle
 import buencolors as bc
 
 
@@ -74,6 +77,44 @@ class TestStyleRegistration:
 
             # Check that background is transparent (none)
             assert ax.get_facecolor() == (0.0, 0.0, 0.0, 0.0) or ax.get_fc() == 'none'
+
+
+class TestMatplotlibCompat:
+    """Guard against reliance on deprecated/removed matplotlib APIs."""
+
+    @staticmethod
+    def _user_library_paths():
+        paths = getattr(matplotlib.style, 'USER_LIBRARY_PATHS', None)
+        if paths is None:
+            from matplotlib.style.core import USER_LIBRARY_PATHS as paths
+        return paths
+
+    def test_import_does_not_use_deprecated_api(self):
+        """Re-importing the package must not touch deprecated matplotlib APIs."""
+        with warnings.catch_warnings():
+            warnings.simplefilter('error', matplotlib.MatplotlibDeprecationWarning)
+            importlib.reload(bc)
+
+        assert 'pretty-plot' in plt.style.available
+
+    def test_style_registration_is_idempotent(self):
+        """Reloading the package must not duplicate the style directory entry."""
+        importlib.reload(bc)
+        importlib.reload(bc)
+
+        paths = self._user_library_paths()
+        assert paths.count(str(bc.STYLE_DIR)) == 1
+        assert 'pretty-plot' in plt.style.available
+
+    def test_colormap_lookups_do_not_use_deprecated_api(self):
+        """Interpolated palettes and named colormaps must not use cm.get_cmap."""
+        with warnings.catch_warnings():
+            warnings.simplefilter('error', matplotlib.MatplotlibDeprecationWarning)
+            interpolated = bc.get_palette('solar_flare', n=20)
+            mapped = bc.number_to_color([1, 2, 3], 'coolwarm')
+
+        assert len(interpolated) == 20
+        assert len(mapped) == 3
 
 
 class TestEndToEndWorkflow:

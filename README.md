@@ -265,12 +265,12 @@ bc.clean_umap(adata, color='louvain', outline_style=True, outline_width=(0.5, 0.
 
 `outline_style` accepts:
 
-| Value | Effect |
-|---|---|
-| `False` (default) | No outlines |
-| `True` | Outline every cell |
-| `"Group name"` | Dim all cells, outline the named group |
-| `["G1", "G2"]` | Dim all cells, outline the listed groups |
+| Value             | Effect                                   |
+|-------------------|------------------------------------------|
+| `False` (default) | No outlines                              |
+| `True`            | Outline every cell                       |
+| `"Group name"`    | Dim all cells, outline the named group   |
+| `["G1", "G2"]`    | Dim all cells, outline the listed groups |
 
 ## Examples
 
